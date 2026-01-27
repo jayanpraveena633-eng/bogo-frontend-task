@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOGO Offer Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* CSS Variables for easy maintenance */
+        :root {
+            --primary-color: #FF6B82;
+            --text-dark: #333333;
+            --text-light: #888888;
+            --border-color: #DDDDDD;
+            --background-light: #F9F9F9;
+            --white: #FFFFFF;
+        }
+
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Card Container */
+        .card {
+            background: var(--white);
+            width: 100%;
+            max-width: 400px;
+            padding: 24px;
+            border-radius: 8px; /* Optional rounded corners */
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+            .header h2 {
+                color: var(--primary-color);
+                font-size: 20px;
+                font-weight: 700;
+                background: var(--white);
+                display: inline-block;
+                padding: 0 10px;
+                z-index: 1;
+                position: relative;
+            }
+
+            .header::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 0;
+                right: 0;
+                height: 1px;
+                background: #E0E0E0;
+                z-index: 0;
+            }
+
+        /* Product Option Boxes */
+        .option-box {
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+            display: block; /* To act as label */
+        }
+
+            .option-box.selected {
+                border: 2px solid var(--primary-color);
+                background-color: rgba(255, 107, 130, 0.03);
+                margin-bottom: 15px;
+            }
+
+        /* Flex container for the top row of an option */
+        .option-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Left side: Radio + Info */
+        .option-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Custom Radio Button */
+        .custom-radio {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .option-box.selected .custom-radio {
+            border-color: var(--primary-color);
+        }
+
+        .custom-radio::after {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: none;
+        }
+
+        .option-box.selected .custom-radio::after {
+            display: block;
+        }
+
+        /* Hide default radio input */
+        input[type="radio"] {
+            display: none;
+        }
+
+        /* Unit Info */
+        .unit-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .unit-info p {
+            font-size: 12px;
+            color: var(--text-dark);
+        }
+
+        /* Discount Tag */
+        .tag {
+            background: var(--primary-color);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 3px 6px;
+            border-radius: 2px;
+        }
+
+        /* Price Section */
+        .price-info {
+            text-align: right;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .current-price {
+            font-weight: 700;
+            font-size: 16px;
+            color: var(--text-dark);
+        }
+
+        .old-price {
+            font-size: 11px;
+            color: var(--text-light);
+            text-decoration: line-through;
+            margin-top: 2px;
+        }
+
+        /* Most Popular Badge */
+        .most-popular {
+            position: absolute;
+            top: -12px;
+            right: 0px;
+            background: var(--primary-color);
+            color: white;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 4px 4px 0 0; /* Adjusted for look */
+            text-transform: uppercase;
+        }
+
+            .most-popular::after {
+                /* Create the little triangle fold effect (optional aesthetic) */
+                content: '';
+                position: absolute;
+                right: 0;
+                bottom: -5px;
+                border-left: 5px solid transparent;
+                border-top: 5px solid #cc4e61; /* Darker pink */
+            }
+
+        /* Options Dropdown (Size/Color) */
+        .options-expand {
+            display: none;
+            margin-top: 15px;
+            padding-left: 30px; /* Align with text */
+        }
+
+        .option-box.selected .options-expand {
+            display: block;
+        }
+
+        .selectors-grid {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+        }
+
+            .selectors-grid label {
+                font-size: 11px;
+                color: var(--text-dark);
+                margin-bottom: 2px;
+                display: block;
+            }
+
+        .select-wrapper select {
+            width: 100%;
+            padding: 6px;
+            border: 1px solid var(--border-color);
+            border-radius: 2px;
+            font-size: 12px;
+            background: white;
+            color: var(--text-dark);
+            cursor: pointer;
+        }
+
+        .row-label {
+            font-size: 12px;
+            color: #888;
+            padding-top: 15px; /* Alignment fix */
+        }
+
+        /* Footer Section */
+        .footer-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+        .free-delivery {
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .total-price {
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* Add to Cart Button */
+        .add-to-cart {
+            width: 100%;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+            .add-to-cart:hover {
+                background-color: #e55a70;
+            }
+
+        .attribution {
+            text-align: right;
+            font-size: 10px;
+            color: #aaa;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        #toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #333;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 1000;
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none; /* User can click through it */
+}
+
+.toast-hidden {
+    opacity: 0;
+    transform: translate(-50%, 20px) !important;
+}
+
+.toast-visible {
+    opacity: 1;
+    transform: translate(-50%, 0) !important;
+}
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <div class="header">
+            <h2>YAY! It's BOGO</h2>
+        </div>
+
+        <div id="offer-container">
+
+            <label class="option-box" data-price="10.00">
+                <input type="radio" name="offer" value="1">
+                <div class="option-header">
+                    <div class="option-left">
+                        <div class="custom-radio"></div>
+                        <div class="unit-info">
+                            <h3>1 Unit <span class="tag">10% Off</span></h3>
+                            <p>Standard Price</p>
+                        </div>
+                    </div>
+                    <div class="price-info">
+                        <span class="current-price">$10.00 USD</span>
+                        <span class="old-price">$24.00 USD</span>
+                    </div>
+                </div>
+
+                <div class="options-expand">
+                    <div class="selectors-grid">
+                        <div></div> <label>Size</label>
+                        <label>Colour</label>
+
+                        <span class="row-label">#1</span>
+                        <div class="select-wrapper">
+                            <select><option>S</option><option>M</option><option>L</option></select>
+                        </div>
+                        <div class="select-wrapper">
+                            <select><option>Black</option><option>Red</option></select>
+                        </div>
+                    </div>
+                </div>
+            </label>
+
+            <label class="option-box selected" data-price="18.00">
+                <input type="radio" name="offer" value="2" checked>
+                <div class="most-popular">Most Popular</div>
+                <div class="option-header">
+                    <div class="option-left">
+                        <div class="custom-radio"></div>
+                        <div class="unit-info">
+                            <h3>2 Unit <span class="tag">20% Off</span></h3>
+                        </div>
+                    </div>
+                    <div class="price-info">
+                        <span class="current-price">$18.00 USD</span>
+                        <span class="old-price">$24.00 USD</span>
+                    </div>
+                </div>
+
+                <div class="options-expand">
+                    <div class="selectors-grid">
+                        <div></div> <label>Size</label>
+                        <label>Colour</label>
+
+                        <span class="row-label">#1</span>
+                        <div class="select-wrapper">
+                            <select>
+                                <option>S</option>
+                                <option>M</option>
+                                <option>L</option>
+                            </select>
+                        </div>
+                        <div class="select-wrapper">
+                            <select>
+                                <option>Black</option>
+                                <option>Green</option>
+                                <option>Blue</option>
+                            </select>
+                        </div>
+
+                        <span class="row-label">#2</span>
+                        <div class="select-wrapper">
+                            <select>
+                                <option>S</option>
+                                <option>M</option>
+                                <option>L</option>
+                            </select>
+                        </div>
+                        <div class="select-wrapper">
+                            <select>
+                                <option>Colour</option>
+                                <option>Black</option>
+                                <option>White</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </label>
+
+            <label class="option-box" data-price="24.00">
+                <input type="radio" name="offer" value="3">
+                <div class="option-header">
+                    <div class="option-left">
+                        <div class="custom-radio"></div>
+                        <div class="unit-info">
+                            <h3>3 Unit <span class="tag">30% Off</span></h3>
+                        </div>
+                    </div>
+                    <div class="price-info">
+                        <span class="current-price">$24.00 USD</span>
+                        <span class="old-price">$24.00 USD</span>
+                    </div>
+                </div>
+
+                <div class="options-expand">
+                    <div class="selectors-grid">
+                        <div></div>
+                        <label>Size</label>
+                        <label>Colour</label>
+
+                        <span class="row-label">#1</span>
+                        <div class="select-wrapper"><select><option>S</option></select></div>
+                        <div class="select-wrapper"><select><option>Black</option></select></div>
+
+                        <span class="row-label">#2</span>
+                        <div class="select-wrapper"><select><option>S</option></select></div>
+                        <div class="select-wrapper"><select><option>Black</option></select></div>
+
+                        <span class="row-label">#3</span>
+                        <div class="select-wrapper"><select><option>S</option></select></div>
+                        <div class="select-wrapper"><select><option>Black</option></select></div>
+                    </div>
+                </div>
+            </label>
+
+        </div>
+
+        <div class="footer-info">
+            <span class="free-delivery">Free Delivery</span>
+            <span class="total-price">Total : $18.00 USD</span>
+        </div>
+
+        <button class="add-to-cart">
+            <span>+</span> Add to Cart
+        </button>
+
+        <div class="attribution">@ Demo Project – Frontend Technical Support Task</div>
+<div id="toast" class="toast-hidden">🛒 Added to Cart!</div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Get all radio inputs and option boxes
+        const radios = document.querySelectorAll('input[type="radio"][name="offer"]');
+        const totalPriceElement = document.querySelector('.total-price');
+        const addToCartBtn = document.querySelector('.add-to-cart');
+        // Function to update the UI
+        function updateSelection() {
+            radios.forEach(radio => {
+                // Find the parent label (.option-box)
+                const parentBox = radio.closest('.option-box');
+
+                if (radio.checked) {
+                    // Add selected class to expand and style
+                    parentBox.classList.add('selected');
+
+                    // Update Total Price at bottom
+                    const price = parentBox.getAttribute('data-price');
+                    totalPriceElement.textContent = `Total : $${price} USD`;
+                } else {
+                    // Remove selected class
+                    parentBox.classList.remove('selected');
+                }
+            });
+        }
+
+        // Attach event listeners to all radios
+        radios.forEach(radio => {
+            radio.addEventListener('change', updateSelection);
+        });
+       const toast = document.getElementById('toast');
+
+addToCartBtn.addEventListener('click', () => {
+    // Get the selected text
+    const selectedOption = document.querySelector('.option-box.selected h3').childNodes[0].textContent.trim();
+    
+    // Set the toast message
+    toast.textContent = `🛒 Added ${selectedOption} to cart!`;
+    
+    // Show the toast
+    toast.className = "toast-visible";
+
+    // Hide it after 3 seconds
+    setTimeout(() => {
+        toast.className = "toast-hidden";
+    }, 3000);
+});
+        // Initialize (in case of page reload)
+        updateSelection();
+    });
+    </script>
+
+</body>
+</html>
