@@ -17,3 +17,7 @@ as part of a Frontend Technical Support interview assignment.
 
 ## Live Demo
 (Deployed via Netlify)
+
+## Resume
+📄 View my resume here:  
+https://github.com/your-username/bogo-frontend-task/blob/main/Praveena_J_Resume.pdf
